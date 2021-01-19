@@ -172,6 +172,12 @@ function buttonOnClickGreen(){
     console.log(player.name + " at X: " + player.x + "  Y: " + player.y);
 }
 
+//Attack
+function buttonOnClickAttack(){
+  console.log("Attack button Pressed");
+  console.log("HIYAAAH");
+}
+
 
 function gameloop() 
 {
