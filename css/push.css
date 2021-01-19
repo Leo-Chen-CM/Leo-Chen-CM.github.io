@@ -1,0 +1,37 @@
+.button {
+    background-color: #000000;
+    border: none;
+    box-shadow: 0 9px#505050;
+    padding: 30px;
+    text-align: center;
+    font-size: 28px;
+}
+
+.button:hover {
+    background-color: #3f3f3f;
+}
+
+.button:active {
+    box-shadow: 0 5px #3d3d3d;
+    transform: translateY(4px);
+}
+
+.red {
+    color: #FF0000;
+}
+
+.green {
+    color: #00FF00;
+}
+
+.blue {
+    color: #0000FF;
+}
+
+.yellow {
+    color: #FFFF00;
+}
+
+.round {
+    border-radius: 50%;
+}
