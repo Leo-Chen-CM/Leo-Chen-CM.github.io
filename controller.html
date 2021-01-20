@@ -5,9 +5,22 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="./css/push.css">
+
+    <script type="text/javascript" charset="utf-8">
+    function pageLoaded() {
+
+      var url_string = window.location.href;
+      var url = new URL(url_string);
+      var username = url.searchParams.get("username");
+      console.log(username);
+      alert(username);
+    }
+    </script>
 </head>
 
-<body>
+<body onload="pageLoaded()">
+
+
     <canvas tabindex="1" id="game" width="500" height="500">
         Oops! looks like your browser does not support canvas tag
     </canvas>
@@ -58,7 +71,7 @@
             </tbody>
         </tbody>
     </table>
-
+    
 </body>
 <script src="./js/script.js"></script>
 

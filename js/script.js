@@ -119,6 +119,13 @@ function animate()
     } 
 
 }
+
+function takeDamage()
+{
+  
+
+}
+
 // Draw GameObjects to Console
 // Modify to Draw to Screen
 function draw() 
