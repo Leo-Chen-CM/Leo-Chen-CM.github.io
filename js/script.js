@@ -11,20 +11,35 @@ spritesheet.src = "./img/Ghost spritesheet.png";
 var enemyImage = new Image();
 enemyImage.src = "./img/1to6.png";
 
+var score = 0;
+
+function pageLoaded() 
+{
+  var url_string = window.location.href;
+  var url = new URL(url_string);
+  var username = url.searchParams.get("username");
+  console.log(username);
+  alert(username);
+}
 
 // Update Heads Up Display with Weapon Information
-function weaponSelection() {
-    var selection = document.getElementById("equipment").value;
-    var active = document.getElementById("active");
-    if (active.checked == true) {
-      document.getElementById("HUD").innerHTML = selection + " active ";
-      console.log("Weapon Active");
-    } else {
-      document.getElementById("HUD").innerHTML = selection + " selected ";
-      console.log("Weapon Selected");
-    }
+function weaponSelection() 
+{
+  var selection = document.getElementById("equipment").value;
+  var active = document.getElementById("active");
+  if (active.checked == true) 
+  {
+    document.getElementById("HUD").innerHTML = selection + " active ";
+    console.log("Weapon Active");
+  } 
+  else 
+  {
+    document.getElementById("HUD").innerHTML = selection + " selected ";
+    console.log("Weapon Selected");
   }
-  
+}
+
+
   // Draw a HealthBar on Canvas, can be used to indicate players health
   function drawHealthbar() {
     var width = 150;
@@ -66,7 +81,8 @@ function weaponSelection() {
   
   var selectBox = document.getElementById('equipment');
   
-  for (var i = 0; i < options.length; i++) {
+  for (var i = 0; i < options.length; i++)
+  {
     var option = options[i];
     selectBox.options.add(new Option(option.text, option.value, option.selected));
   }
@@ -79,7 +95,8 @@ var frames = 6;
 
 var currentFrame = 0;
 
-function GameObject(name, img, health) {
+function GameObject(name, img, health) 
+{
     this.name = name;
     this.img = img; //Can hold img files
     this.health = health;
@@ -104,6 +121,7 @@ player.y = 100;
 var enemy = new GameObject("Enemy", enemyImage, 100);
 enemy.x = 400;
 enemy.y = 400;
+var score = 0;
 // Gameobjects is a collection of the Actors within the game
 // An Array
 
@@ -120,10 +138,33 @@ function animate()
 
 }
 
+function updateScore()
+{
+  var score = localStorage.getItem('score');
+
+    if(isNaN(score))
+    {
+      localStorage.setItem('score', 0);
+      document.getElementById("SCORE").innerHTML = "[" + score + "]";
+      console.log(score);
+    }
+    else
+    {
+      localStorage.setItem('score', 0, parseInt(score) + 1);
+      document.getElementById("SCORE").innerHTML = "[" + score + "]";
+      console.log(score);
+    }
+}
+
+
 function takeDamage()
 {
-  
+  if(player.img.x > enemy.img.x && player.img.y > enemy.img.y)
+    {
+      val--;
 
+      console.log("Ye took damage");
+    }
 }
 
 // Draw GameObjects to Console
@@ -189,6 +230,7 @@ function buttonOnClickAttack(){
 function gameloop() 
 {
     draw();
+    takeDamage();
     window.requestAnimationFrame(gameloop);
 }
 
