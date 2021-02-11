@@ -41,11 +41,11 @@ function weaponSelection()
 
 
   // Draw a HealthBar on Canvas, can be used to indicate players health
-  function drawHealthbar() {
+  function drawHealthbar() 
+  {
     var width = 150;
     var height = 20;
     var max = 100;
-    var val = 100;
   
     // Draw the background
     context.fillStyle = "#000000";
@@ -54,7 +54,7 @@ function weaponSelection()
 
     // Draw the fill
     context.fillStyle = "#00FF00";
-    var fillVal = Math.min(Math.max(val / max, 0), 1);
+    var fillVal = Math.min(Math.max(player.health / max, 0), 1);
     context.fillRect(player.x, player.y - 100, fillVal * width, height);
 
   }
@@ -150,19 +150,40 @@ function updateScore()
     }
     else
     {
-      localStorage.setItem('score', 0, parseInt(score) + 1);
+      localStorage.setItem('score', parseInt(score) + 1);
       document.getElementById("SCORE").innerHTML = "[" + score + "]";
       console.log(score);
     }
 }
 
+function moveAI()
+{
+
+  if(player.x > enemy.x )
+  {
+    enemy.x++;
+  }
+  if(player.x < enemy.x )
+  {
+    enemy.x--;
+  }
+  if(player.y > enemy.y )
+  {
+    enemy.y++;
+  }
+  if(player.y < enemy.y )
+  {
+    enemy.y--;
+  }
+}
+
 
 function takeDamage()
 {
-  if(player.img.x > enemy.img.x && player.img.y > enemy.img.y)
+  if(player.x == enemy.x && player.y == enemy.y)
     {
-      val--;
-
+      player.health--;
+      
       console.log("Ye took damage");
     }
 }
@@ -221,9 +242,11 @@ function buttonOnClickGreen(){
 }
 
 //Attack
-function buttonOnClickAttack(){
+function buttonOnClickAttack()
+{
   console.log("Attack button Pressed");
   console.log("HIYAAAH");
+  console.log(score);
 }
 
 
@@ -231,6 +254,8 @@ function gameloop()
 {
     draw();
     takeDamage();
+    moveAI();
+    //updateScore();
     window.requestAnimationFrame(gameloop);
 }
 
