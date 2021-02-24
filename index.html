@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="English">
+<html lang="en">
 <head>
 <title>Game Form</title>
 </head>
@@ -15,29 +15,36 @@
 
 <form action="controller.html" method="GET" target="_blank">
 
-<input type="text" name="username" value="Enter Username">
 
-<input type="password" name="password" value="Enter Password"><br>
+<label for ="name">Enter your Username</label>
+<input id ="name" type="text" name="username" value="Enter Username"><br>
 
-<input type="radio" name="enemy" value="val1">Spooky Bad Enemy 1<br>
-<input type="radio" name="enemy" value="val2">Spooky Bad Enemy 2<br>
+<label for ="password">Enter your Password</label>
+<input id ="password" type="password" name="password" value="Enter Password"><br>
 
-<button type="reset">Reset</button>
 
-<button type="submit">Submit</button>
+<label>
+    Select difficulty:<br>
+<input type="radio" name="difficulty" value="val1">Easy Mode<br>
+<input type="radio" name="difficulty" value="val2">Normal Mode<br>
+</label>
 
-<input type="hidden" name="item" value="bomb"><br>
 
+
+<label>
+    Select Enemy Colour
 <select name="Enemy Colour">
-
 <option value="Red">Red</option>
 <option value="Green">Green</option>
 <option value="Blue">Blue</option>
+</label>
+</select><br>
 
-</select>
+<button type="reset">Reset</button>
+<button type="submit">Submit</button>
 
+<input type="hidden" name="item" value="bomb"><br>
 </form>
-
 </body>
 
 <script src="./js/script.js"></script>
