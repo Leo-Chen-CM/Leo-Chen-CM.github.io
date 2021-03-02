@@ -4,7 +4,6 @@ var canvas = document.getElementById("game");
 
 // get 2D context for this canvas
 var context = canvas.getContext("2d");
-
 var spritesheet = new Image();
 spritesheet.src = "./img/Ghost spritesheet.png";
 

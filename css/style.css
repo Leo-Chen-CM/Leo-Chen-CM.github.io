@@ -29,3 +29,13 @@
 .round {
     border-radius: 50%;
 }
+
+body 
+{
+    display: table-cell;
+    vertical-align: middle; 
+    text-align: center;
+    background-color:rgb(241, 0, 0); 
+    color:white; 
+    font-family: "arial", sans-serif; 
+}
