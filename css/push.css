@@ -7,6 +7,11 @@
     font-size: 28px;
 }
 
+.input{
+
+    font-size: 12px 60%;
+}
+
 .button:hover {
     background-color: #3f3f3f;
 }
