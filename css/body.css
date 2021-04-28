@@ -1,0 +1,11 @@
+body{
+    background-image: url(https://ak.picdn.net/shutterstock/videos/6932383/thumb/1.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+canvas{
+    position:fixed;
+    left: 500px;
+}

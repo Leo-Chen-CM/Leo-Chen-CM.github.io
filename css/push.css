@@ -20,23 +20,3 @@
     box-shadow: 0 5px #3d3d3d;
     transform: translateY(4px);
 }
-
-.red {
-    color: #FF0000;
-}
-
-.green {
-    color: #00FF00;
-}
-
-.blue {
-    color: #0000FF;
-}
-
-.yellow {
-    color: #FFFF00;
-}
-
-.round {
-    border-radius: 50%;
-}

@@ -1,145 +1,206 @@
-
 // get a handle to the canvas context
 var canvas = document.getElementById("game");
 
 // get 2D context for this canvas
 var context = canvas.getContext("2d");
-var spritesheet = new Image();
-spritesheet.src = "./img/Ghost spritesheet.png";
+var HealthBar = [];
+var cannonImage = new Image();
+cannonImage.src = "./imgs/Generic Cannon.png";
 
-var enemyImage = new Image();
-enemyImage.src = "./img/1to6.png";
+var cannonImageDamaged1 =new Image();
+cannonImageDamaged1.src = "./imgs/Generic Cannon Damaged.png";
 
-var score = 0;
+var cannonImageDamaged2 =new Image();
+cannonImageDamaged2.src = "./imgs/Generic Cannon Damaged 2.png";
 
-function pageLoaded() 
+var cannonImageDestroyed =new Image();
+cannonImageDestroyed.src = "./imgs/Generic Cannon Destroyed.png";
+
+function sound(src) 
 {
-  var url_string = window.location.href;
-  var url = new URL(url_string);
-  var username = url.searchParams.get("username");
-  console.log(username);
-  alert(username);
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function()
+    {
+      this.sound.play();
+    }
+    this.stop = function()
+    {
+      this.sound.pause();
+    }
 }
 
-// Update Heads Up Display with Weapon Information
-function weaponSelection() 
+var gameRunning = true;
+
+var cannonFireSound;
+
+cannonFireSound = new sound("./sounds/cannon_fire.ogg");
+
+var rocketImage = new Image();
+rocketImage.src = "./imgs/Ammo Up.png";
+
+var tankImage = new Image();
+tankImage.src = "./imgs/Tank.png";
+
+var score = 0;
+var supplies = 10;
+var ammunition = 10;
+
+var enemySpeed = 0.1;
+
+var resource = 0;
+
+
+
+function GameObject(name, img, health, ammo)
 {
-  var selection = document.getElementById("equipment").value;
-  var active = document.getElementById("active");
-  if (active.checked == true) 
-  {
-    document.getElementById("HUD").innerHTML = selection + " active ";
-    console.log("Weapon Active");
-  } 
-  else 
-  {
-    document.getElementById("HUD").innerHTML = selection + " selected ";
-    console.log("Weapon Selected");
-  }
+    this.name = name;
+    this.img = img;
+    this.health = health;
+    this.ammo = ammo;
+    this.x = 0;
+    this.y = 0;
+
+}
+
+function enemyObject(name, img, location, speed)
+{
+    this.name = name;
+    this.img = img;
+    this.location = location;
+    this.x = 0;
+    this.y = 0;
+    this.speed = speed;
+}
+
+function bulletObject(name, img, speed, fired, location)
+{
+    this.name = name;
+    this.img = img;
+    this.speed = speed;
+    this.fired = fired;
+    this.location = location;
+}
+
+
+
+
+function pageLoaded()
+{
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var username = url.searchParams.get("username");
+    console.log(username);
+    alert("Hello Commander " + username);
+    gameLoop();
+}
+
+//Contains all objects for the game
+//Player objects
+var playerCannonWest = new GameObject("CannonWest", cannonImage, 100, 5);
+playerCannonWest.x = 10;
+playerCannonWest.y = 550;
+
+var playerCannonNorth = new GameObject("CannonNorth", cannonImage, 100, 5);
+playerCannonNorth.x = 200;
+playerCannonNorth.y = 550;
+
+var playerCannonEast = new GameObject("CannonEast", cannonImage, 100, 5);
+playerCannonEast.x = 400;
+playerCannonEast.y = 550;
+
+var playerGameObjectsArray = [playerCannonWest, playerCannonNorth, playerCannonEast];
+
+//Bullet Objects
+var playerBullet = new bulletObject("Bullet", rocketImage, 1);
+
+var playerBulletArray= [];
+var playerBulletIndex = 0;
+
+for (let index = 0; index < 15; index++) 
+{
+    playerBulletArray[index] = new bulletObject("Bullet", rocketImage, 1, false, cannonFireSound);
+}
+
+//Enemy Objects
+var enemyTankArray = [];
+
+for (let index = 0; index < 9; index++) 
+{
+    enemyTankArray[index] = new enemyObject("Tank", tankImage, 0, 0.1);
+}
+
+//Setting their spawns
+for (let index = 0; index < enemyTankArray.length; index++) 
+{
+    var randomNumber = Math.floor(Math.random() * 3);
+    enemyTankArray[index].location = randomNumber;
+    enemyTankArray[index].x = playerGameObjectsArray[randomNumber].x + 30;
+    enemyTankArray[index].y = -150 ;
+    console.log("Tank Pos: " + enemyTankArray[index].x + ", " + enemyTankArray[index].y);
+}
+
+
+function draw()
+{
+    context.clearRect(0,0,1500,1500);
+    
+    drawHealthState();
+
+    for (let index = 0; index < playerGameObjectsArray.length; index++) 
+    {
+        context.drawImage(playerGameObjectsArray[index].img, playerGameObjectsArray[index].x, playerGameObjectsArray[index].y);
+    }
+
+    for (let index = 0; index < playerBulletArray.length; index++) 
+    {
+        if (playerBulletArray[index].fired == true) 
+        {
+            context.drawImage(playerBulletArray[index].img, playerBulletArray[index].x, playerBulletArray[index].y);
+        }
+    }
+
+    for (let index = 0; index < enemyTankArray.length; index++) 
+    {  
+        context.drawImage(enemyTankArray[index].img, enemyTankArray[index].x, enemyTankArray[index].y);
+
+    }
 }
 
 
   // Draw a HealthBar on Canvas, can be used to indicate players health
-  function drawHealthbar() 
+  function drawHealthState() 
   {
-    var width = 150;
-    var height = 20;
-    var max = 100;
-  
-    // Draw the background
-    context.fillStyle = "#000000";
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillRect(player.x, player.y - 100, width, height);
+        for (let index = 0; index < playerGameObjectsArray.length; index++) 
+        {
+            if (playerGameObjectsArray[index].health >= 76) 
+            {
+                playerGameObjectsArray[index].img = cannonImage;
+            }     
+            if (playerGameObjectsArray[index].health >= 50 && playerGameObjectsArray[index].health <= 75) 
+            {
+                playerGameObjectsArray[index].img = cannonImageDamaged1;
+            }
+            if (playerGameObjectsArray[index].health >= 1 && playerGameObjectsArray[index].health <= 49) 
+            {
+                playerGameObjectsArray[index].img = cannonImageDamaged2;
+            }
+            if (playerGameObjectsArray[index].health == 0) 
+            {
+                playerGameObjectsArray[index].img = cannonImageDestroyed;
+            }     
 
-    // Draw the fill
-    context.fillStyle = "#00FF00";
-    var fillVal = Math.min(Math.max(player.health / max, 0), 1);
-    context.fillRect(player.x, player.y - 100, fillVal * width, height);
-
+        }
   }
-  
-  // Array of Weapon Options
-  var options = [{
-      "text": "Select a Weapon",
-      "value": "No Weapon",
-      "selected": true
-    },
-    {
-      "text": "Spear",
-      "value": "Javelin"
-    },
-    {
-      "text": "Sword",
-      "value": "Longsword"
-    },
-    {
-      "text": "Crossbow",
-      "value": "Pistol crossbow"
-    }
-  ];
-  
-  var selectBox = document.getElementById('equipment');
-  
-  for (var i = 0; i < options.length; i++)
-  {
-    var option = options[i];
-    selectBox.options.add(new Option(option.text, option.value, option.selected));
-  }
-  
-
-
-context.scale(0.5,0.5);
-
-var frames = 6;
-
-var currentFrame = 0;
-
-function GameObject(name, img, health) 
-{
-    this.name = name;
-    this.img = img; //Can hold img files
-    this.health = health;
-    this.x = 0;
-    this.y = 0;
-}
-
-// The GamerInput is an Object that holds the Current
-// GamerInput (Left, Right, Up, Down)
-function GamerInput(input) {
-    this.action = input;
-}
-
-// Default GamerInput is set to None
-var gamerInput = new GamerInput("None"); //No Input
-
-// Default Player
-var player = new GameObject("Player", spritesheet, 100);
-player.x = 100;
-player.y = 100;
-
-var enemy = new GameObject("Enemy", enemyImage, 100);
-enemy.x = 400;
-enemy.y = 400;
-var score = 0;
-// Gameobjects is a collection of the Actors within the game
-// An Array
-
-var initial = new Date().getTime();
-var current; // current time
-
-function animate() 
-{
-    current = new Date().getTime(); // update current
-    if (current - initial >= 500) { // check is greater that 500 ms
-        currentFrame = (currentFrame + 1) % frames; // update frame
-        initial = current; // reset initial
-    } 
-
-}
 
 function updateScore()
 {
-  var score = localStorage.getItem('score');
+
+    score = localStorage.getItem('score');
 
     if(isNaN(score))
     {
@@ -153,110 +214,255 @@ function updateScore()
       document.getElementById("SCORE").innerHTML = "[" + score + "]";
       console.log(score);
     }
+
+    score++;
+    console.log("Score: " + score);
+
+    resource++;
+    console.log("Resouce: " + resource);
+
+    showResources();
 }
 
-function moveAI()
+function loseState()
 {
-
-  if(player.x > enemy.x )
-  {
-    enemy.x++;
-  }
-  if(player.x < enemy.x )
-  {
-    enemy.x--;
-  }
-  if(player.y > enemy.y )
-  {
-    enemy.y++;
-  }
-  if(player.y < enemy.y )
-  {
-    enemy.y--;
-  }
-}
-
-
-function takeDamage()
-{
-  if(player.x == enemy.x && player.y == enemy.y)
+    if (playerCannonEast.health <= 0 & playerCannonNorth.health <= 0 & playerCannonWest.health <= 0 ) 
     {
-      player.health--;
-      
-      console.log("Ye took damage");
+        alert("Whelp you lost");
+        gameRunning = false;
     }
 }
 
-// Draw GameObjects to Console
-// Modify to Draw to Screen
-function draw() 
+function moveSprites()
 {
-    // Clear Canvas
-    // Iterate through all GameObjects
-    // Draw each GameObject
-
-
-    //console.log("Should be drawing");
-    context.clearRect(0, 0, 1000, 1000);
-
-    drawHealthbar();
-
-
-    context.drawImage(player.img, (player.img.width / 6) * currentFrame, 0 ,player.img.width / 6, player.img.height, player.x, player.y, 150, 150);
-    animate();
-
-    context.drawImage(enemy.img, (enemy.img.width / 6) * currentFrame, 0, enemy.img.width / 6, enemy.img.height, enemy.x, enemy.y, 150, 150);
-    //console.log("Should be drawing");
-    //console.log("X: " + enemy.x + "  Y: " + enemy.y);
-
+    moveProjectile();
+    moveEnemy();
 }
 
-
-//Up
-function buttonOnClickYellow(){
-    player.y -= 100;
-    console.log("Y = Up");
-    console.log(player.name + " at X: " + player.x + "  Y: " + player.y);
-}
-
-//Left
-function buttonOnClickBlue(){
-    player.x -= 100;
-    console.log("Blue = Left");
-    console.log(player.name + " at X: " + player.x + "  Y: " + player.y);
-}
-
-//Right
-function buttonOnClickRed(){
-    player.x += 100;
-    console.log("Red = Right");
-    console.log(player.name + " at X: " + player.x + "  Y: " + player.y);
-}
-
-//Down
-function buttonOnClickGreen(){
-    player.y += 100;
-    console.log("Green = Down");
-    console.log(player.name + " at X: " + player.x + "  Y: " + player.y);
-}
-
-//Attack
-function buttonOnClickAttack()
+function moveProjectile()
 {
-  console.log("Attack button Pressed");
-  console.log("HIYAAAH");
-  console.log(score);
+    for (let index = 0; index < playerBulletArray.length; index++) 
+    {
+
+        if (playerBulletArray[index].fired == true) 
+        {
+            playerBulletArray[index].y -= playerBulletArray[index].speed;
+        }
+        if (playerBulletArray[index].y < -100) 
+        {
+            playerBulletArray[index].fired = false;
+            playerBulletArray[index].x = 10000;
+            playerBulletArray[index].y = 10000;
+        }
+    }
+
 }
 
 
-function gameloop() 
+
+
+function moveEnemy()
 {
-    draw();
-    takeDamage();
-    moveAI();
-    //updateScore();
-    window.requestAnimationFrame(gameloop);
+    for (let index = 0; index < enemyTankArray.length; index++) 
+    {
+        if (enemyTankArray[index].y < 450)
+        {
+            enemyTankArray[index].y = enemyTankArray[index].y + enemyTankArray[index].speed;
+        }
+    }
+
+}
+
+function takeDamage()
+{
+    for (let i = 0; i < enemyTankArray.length; i++) 
+    {
+        for (let j = 0; j < playerGameObjectsArray.length; j++)
+        {
+            if (enemyTankArray[i].y >= 450) 
+            {
+
+                playerGameObjectsArray[j].health -= 25;
+                console.log(playerGameObjectsArray[j].name + " has been damaged: "+ playerGameObjectsArray[j].health);
+                var randomNumber = Math.floor(Math.random() * 3);
+                enemyTankArray[i].location = randomNumber;
+                enemyTankArray[i].x = playerGameObjectsArray[randomNumber].x + 30;
+                enemyTankArray[i].y = -150 ;
+                drawHealthState();
+            }
+
+        }
+    }
+}
+
+
+//Detects Collisions between projectile and enemy
+function collisionDetection()
+{
+
+    var newPosX = 0;
+    var newPosY = 0;
+
+    for (let i = 0; i < enemyTankArray.length; i++) 
+    {
+        for (let j = 0; j < playerBulletArray.length; j++)
+        {
+
+            if (playerBulletArray[j].fired == true) 
+            {
+
+                if (enemyTankArray[i].location == playerBulletArray[j].location) 
+                {
+                    newPosX = playerBulletArray[j].x - enemyTankArray[i].x;
+                    newPosY = playerBulletArray[j].y - enemyTankArray[i].y;
+
+                    if (newPosX <= 10 && newPosY <= 10) 
+                    {
+                        console.log("Collision detected");
+                        playerBulletArray[j].fired = false;
+                        playerBulletArray[j].x = 10000;
+                        playerBulletArray[j].y = 10000;
+
+                        var randomNumber = Math.floor(Math.random() * 3);
+                        enemyTankArray[i].location = randomNumber;
+                        enemyTankArray[i].x = playerGameObjectsArray[randomNumber].x + 30;
+                        enemyTankArray[i].y = -150 ;
+                        updateScore();
+                        enemyTankArray[i].speed += 0.01;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+function buttonAttack(index)
+{
+    if (playerGameObjectsArray[index].ammo != 0) 
+    {  
+
+        if (playerBulletIndex <= 9) 
+        {
+            playerBulletArray[playerBulletIndex].fired = true;
+            playerBulletArray[playerBulletIndex].x = playerGameObjectsArray[index].x + 30;
+            playerBulletArray[playerBulletIndex].y = playerGameObjectsArray[index].y - 30;
+            playerBulletArray[playerBulletIndex].location = index;
+            playerBulletIndex++;
+            playerGameObjectsArray[index].ammo--;
+            cannonFireSound.play();
+            showAmmo();
+        }
+        else
+        {
+            playerBulletIndex = 0;
+            playerBulletArray[playerBulletIndex].fired = true;
+            playerBulletArray[playerBulletIndex].x = playerGameObjectsArray[index].x + 30;
+            playerBulletArray[playerBulletIndex].y = playerGameObjectsArray[index].y - 30;
+            playerBulletArray[playerBulletIndex].location = index;
+            playerGameObjectsArray[index].ammo--;
+            cannonFireSound.play();
+            showAmmo();
+        }
+        console.log("We fired one round against the enemy: " + playerGameObjectsArray[index].ammo);
+    }
+    else
+    {
+        console.log("SIR WE'RE OUT OF AMMO IN THE CANNON!");
+    }
+}
+
+function buttonRepair(index)
+{
+    if(supplies != 0)
+    {
+        playerGameObjectsArray[index].health += 25;
+        supplies--;
+        console.log(playerGameObjectsArray[index].health);
+        showSupply();
+    }
+    else
+    {
+        console.log("SIR WE'RE OUT OF SPARE PARTS!");
+    }
+}
+
+function buttonReload(index)
+{
+    if(ammunition != 0)
+    {
+        playerGameObjectsArray[index].ammo = playerGameObjectsArray[index].ammo + 1;
+        ammunition--;
+        console.log("Reloaded" + playerGameObjectsArray[index].ammo);
+        showAmmo();
+    }
+    else
+    {
+        console.log("SIR WE'RE OUT OF AMMO!");
+    }
+}
+
+
+function showResources()
+{
+    document.getElementById("RESOURCES").innerHTML = "[" + resource + "]";
+}
+
+function showAmmo()
+{
+    document.getElementById("AMMO").innerHTML = "[" + ammunition + "]";
+}
+
+function showSupply()
+{
+    document.getElementById("SUPPLY").innerHTML = "[" + supplies + "]";
+}
+
+
+function buyAmmo()
+{
+    if (resource >= 2) 
+    {
+        ammunition++;
+        resource -=2;
+        showResources();
+    }
+    else
+    {
+        console.log("No resources");
+    }
+}
+
+
+function buyRepairKit()
+{
+    if (resource >= 2) 
+    {
+        supplies++;
+        resource -=2;
+        showResources();
+    }
+    else
+    {
+        console.log("No resources");
+    }
+
+}
+
+function gameLoop()
+{
+
+    if (gameRunning == true) 
+    {
+        draw();
+        moveSprites();
+        collisionDetection();
+        takeDamage();
+        window.requestAnimationFrame(gameLoop);  
+        loseState();
+    }
+
 }
 
 // Handle Active Browser Tag Animation
-window.requestAnimationFrame(gameloop);
+window.requestAnimationFrame(gameLoop);

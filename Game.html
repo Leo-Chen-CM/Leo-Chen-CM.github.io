@@ -1,0 +1,44 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="./css/buttons.css">
+    <link rel="stylesheet" href="./css/body.css">
+</head>
+
+<body onload="pageLoaded()">
+<canvas tabindex="1" id="game" width="500" height="1000" style="border: 5px solid #000000;">
+    Browser does not support canvas tag. This is bad.
+</canvas>
+<h1>SCORE: </h1>
+<h1 id="SCORE" onload="updateScore()"></h1>
+
+<h1>RESOURCES: </h1>
+<h1 id="RESOURCES" onload="showResources()"></h1><br>
+
+<h1>AMMO: </h1>
+<h1 id="AMMO" onload="showAmmo()"></h1><br>
+
+<h1>SUPPLIES: </h1>
+<h1 id="SUPPLY" onload="showSupply()"></h1><br>
+<button onclick="buttonAttack(0)" class="button grey" style="position: absolute; bottom: 210px; left: 510px;">Attack</button>
+<button onclick="buttonRepair(0)" class="button grey" style="position: absolute; bottom: 110px; left: 510px;">Repair</button>
+<button onclick="buttonReload(0)" class="button grey" style="position: absolute; bottom: 010px; left: 510px;">Reload</button>
+
+<button onclick="buttonAttack(1)" class="button grey" style="position: absolute; bottom: 210px; left: 690px;">Attack</button>
+<button onclick="buttonRepair(1)" class="button grey" style="position: absolute; bottom: 110px; left: 690px;">Repair</button>
+<button onclick="buttonReload(1)" class="button grey" style="position: absolute; bottom: 010px; left: 690px;">Reload</button>
+
+<button onclick="buttonAttack(2)" class="button grey" style="position: absolute; bottom: 210px; left: 890px;">Attack</button>
+<button onclick="buttonRepair(2)" class="button grey" style="position: absolute; bottom: 110px; left: 890px;">Repair</button>
+<button onclick="buttonReload(2)" class="button grey" style="position: absolute; bottom: 010px; left: 890px;">Reload</button>
+
+<button onclick="buyAmmo()" class="button grey" style="position: absolute; bottom: 500px; left: 100px;">Buy Ammo</button>
+<button onclick="buyRepairKit()" class="button grey" style="position: absolute; bottom: 400px; left: 100px;">Buy Repair Kit</button>
+
+</body>
+<script src="./js/script.js"></script>
+</html>
